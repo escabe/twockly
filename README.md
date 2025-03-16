@@ -39,7 +39,7 @@ The digits are drawn by "painting in" certain `x,y` coordinates on the grid. For
 |**6**| ▫| ▫| ▫| ▫| ■| ▫| ■| ▫| ▫| ▫| ▫| ▫| ▫| ▫| ▫| ▫| ■| ▫| ▫| ▫| ▫| ■| ▫| ▫|
 |**7**| ▫| ▫| ▫| ▫| ■| ▫| ■| ■| ■| ■| ▫| ▫| ▫| ■| ■| ■| ■| ▫| ▫| ▫| ▫| ■| ▫| ▫|
 
-For the `1` in the first position the following coordinates need to be painted `(4,1)`,`(4,2)`,`(4,3)`,`(4,5)`,`(4,6)`,`(4,7)` and for the `2` in the second position: `(6,1)`,`(7,1)`,`(8,1)`,`(9,1)`,`(9,2)`,`(9,3)`,`(9,4)`,`(8,4)`,`(7,4)`,`(6,4)`,`(6,5)`,`(6,6)`,`(6,7)`,`(7,7)`,`(8,7)`,`(9,7)` and so on.
+For the `1` in the first position the following coordinates need to be painted `(4,1)`,`(4,2)`,`(4,3)`,`(4,4)`,`(4,5)`,`(4,6)`,`(4,7)` and for the `2` in the second position: `(6,1)`,`(7,1)`,`(8,1)`,`(9,1)`,`(9,2)`,`(9,3)`,`(9,4)`,`(8,4)`,`(7,4)`,`(6,4)`,`(6,5)`,`(6,6)`,`(6,7)`,`(7,7)`,`(8,7)`,`(9,7)` and so on.
 
 These global coordinates then need to be mapped to the correct linear index in the frame. With the [layout above](#layout), the linear indices are as follows:
 
