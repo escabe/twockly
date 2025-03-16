@@ -88,5 +88,5 @@ The `xyToIndex` function performs this translation of global coordinates to line
     
     1.  First convert the global `x` and `y` coordinate to local coordinates using "modulo 8".
 
-    2.  Then do some math and logic to compute the local index based on these local coordinates. The math and logic varies based on the orientation of the tile in question. For now, there is only 1 implementation for the one specific orientation which you get with the [layout above](#layout).
+    2.  Then do some math and logic to compute the local index based on these local coordinates. The math and logic varies based on the orientation of the tile in question. For now, there is only one implementation for the one specific orientation which you get with the [layout above](#layout).
 

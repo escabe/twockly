@@ -30,9 +30,9 @@ def xyToIndex(x,y):
     # Depending on the tile orientation compute the correct local index
     # and add it to the global index
     if tile_info[1] == 0:
-        if y % 2 == 0:
+        if y % 2 == 0: # For even rows, in which the index increases when going left
             index += (7-y) * 8 + (7-x)
-        else:
+        else:          # For odd rows, in which the index increases when going right
             index += (7-y) * 8 + x
     elif tile_info[1] == 1:
         pass # TODO
