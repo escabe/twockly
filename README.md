@@ -64,6 +64,8 @@ This is a front view with the master tile on the left; so the bottom left pixel 
    0 →  1 →  2 →  3 →  4 →  5 →  6 →  7 ↑
 ```
 
+After the last pixel of the tile is reached, the next tile starts at its bottom left again and the indices then "snake up" in the same way again. 
+
 The `xyToIndex` function performs this translation of global coordinates to linear index:
 
 1.  First it determines which tile the global coordinate is on; this is easily done by integer-dividing both `x` and `y` coordinates by `8`.
