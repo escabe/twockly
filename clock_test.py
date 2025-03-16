@@ -12,33 +12,33 @@ GREEN = (0x00, 0xFF, 0x00)
 BLUE = (0x00, 0x00, 0xFF)
 BLACK = (0x00, 0x00, 0x00)
 
-# Define the panel layout
-panels = [
+# Define the tile layout
+tiles = [
     [(0,0),(1,0),(2,0)]
 ]
 # Define x-offsets for each digit
 offsets = [1,6,13,18]
 
 def xyToIndex(x,y):
-    # Determine which panel the requested global coordinate is on
-    panel_info = panels[y//8][x//8]
-    # Start with the base offset to end up on the right panel
-    index = panel_info[0] * 64
-    # Convert global coordinate to local coordinate on the panel
+    # Determine which tile the requested global coordinate is on
+    tile_info = tiles[y//8][x//8]
+    # Start with the base offset to end up on the right tile
+    index = tile_info[0] * 64
+    # Convert global coordinate to local coordinate on the tile
     x = x % 8
     y = y % 8
-    # Depending on the panel orientation compute the correct local index
+    # Depending on the tile orientation compute the correct local index
     # and add it to the global index
-    if panel_info[1] == 0:
+    if tile_info[1] == 0:
         if y % 2 == 0:
             index += (7-y) * 8 + (7-x)
         else:
             index += (7-y) * 8 + x
-    elif panel_info[1] == 1:
+    elif tile_info[1] == 1:
         pass # TODO
-    elif panel_info[1] == 2:
+    elif tile_info[1] == 2:
         pass # TODO
-    elif panel_info[1] == 3:
+    elif tile_info[1] == 3:
         pass # TODO
     
     return index
