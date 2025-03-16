@@ -2,7 +2,7 @@
 
 import asyncio
 import time
-from seven_segment import digits
+from small import digits,font_width,font_height,x_offsets,y_offset,colon_x_offset,colon_y_offset
 
 from ttls.client import Twinkly, TwinklyFrame
 
@@ -17,9 +17,6 @@ BLACK = (0x00, 0x00, 0x00)
 tiles = [
     [(0,0),(1,0),(2,0)]
 ]
-# Define x-offsets for each digit
-offsets = [1,6,13,18]
-colon_offset = offsets[1] + 5
 
 def xyToIndex(x,y):
     # Determine which tile the requested global coordinate is on
@@ -58,16 +55,16 @@ def generate_clock_frame(n: int,blink) -> TwinklyFrame:
         # Get the number
         num = numbers[i]
         # Work through the font grid
-        for y in range(8):
-            for x in range(4):
+        for y in range(font_height):
+            for x in range(font_width):
                 # If pixel should be lit
                 if digits[num][y][x] == 1:
                     # Update the correct pixel
-                    res[xyToIndex(x+offsets[i],y)] = RED
+                    res[xyToIndex(x+x_offsets[i],y+y_offset)] = RED
     # Add the colon
     if blink :
-        res[xyToIndex(colon_offset,3)] = RED
-        res[xyToIndex(colon_offset,5)] = RED
+        res[xyToIndex(colon_x_offset,1+colon_y_offset)] = RED
+        res[xyToIndex(colon_x_offset,3+colon_y_offset)] = RED
 
 
     res[xyToIndex(23,1)] = GREEN
