@@ -51,7 +51,6 @@ def generate_clock_frame(n: int,blink) -> TwinklyFrame:
     # Convert current time to four separate digits
     now = time.localtime()
     numbers = [now.tm_hour//10,now.tm_hour%10,now.tm_min//10,now.tm_min%10]
-    numbers = [8,9,6,6]
     # For each of the four digits
     for i in range(4):
         # Get the number
