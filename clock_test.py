@@ -10,6 +10,7 @@ from ttls.client import Twinkly, TwinklyFrame
 RED = (0xFF, 0x00, 0x00)
 GREEN = (0x00, 0xFF, 0x00)
 BLUE = (0x00, 0x00, 0xFF)
+CYAN = (0x00, 0xFF ,0xFF)
 BLACK = (0x00, 0x00, 0x00)
 
 # Define the tile layout
@@ -18,6 +19,7 @@ tiles = [
 ]
 # Define x-offsets for each digit
 offsets = [1,6,13,18]
+colon_offset = offsets[1] + 5
 
 def xyToIndex(x,y):
     # Determine which tile the requested global coordinate is on
@@ -64,9 +66,16 @@ def generate_clock_frame(n: int,blink) -> TwinklyFrame:
                     res[xyToIndex(x+offsets[i],y)] = RED
     # Add the colon
     if blink :
-        res[xyToIndex(11,3)] = RED
-        res[xyToIndex(11,5)] = RED
+        res[xyToIndex(colon_offset,3)] = RED
+        res[xyToIndex(colon_offset,5)] = RED
 
+
+    res[xyToIndex(23,1)] = GREEN
+    res[xyToIndex(23,4)] = BLUE
+    res[xyToIndex(23,7)] = CYAN
+
+
+    
     return res
 
 
