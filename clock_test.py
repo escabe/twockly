@@ -3,7 +3,7 @@
 import asyncio
 import time
 from small import digits,font_width,font_height,x_offsets,y_offset,colon_x_offset,colon_y_offset
-
+import random
 from ttls.client import Twinkly, TwinklyFrame
 
 # Define some colors
@@ -66,11 +66,14 @@ def generate_clock_frame(n: int,blink) -> TwinklyFrame:
         res[xyToIndex(colon_x_offset,1+colon_y_offset)] = RED
         res[xyToIndex(colon_x_offset,3+colon_y_offset)] = RED
 
+    for i in range(1,18,2):
+        if random.random() < .75:
+            res[xyToIndex(i,0)] = GREEN    
 
-    res[xyToIndex(23,1)] = GREEN
-    res[xyToIndex(23,4)] = BLUE
-    res[xyToIndex(23,7)] = CYAN
-
+    for i in range(19,24,2):
+        for j in range(0,7,2):
+            if random.random() < .75:
+                res[xyToIndex(i,j)] = GREEN    
 
     
     return res
