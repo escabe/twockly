@@ -3,6 +3,7 @@ import time
 BLACK = (0x00,0x00,0x00)
 RED = (0xFF,0x00,0x00)
 GREEN = (0x00,0xFF,0x00)
+DARK_GREEN = (0x00,0x77,0x00)
 
 from small import digits,font_width,font_height
 
@@ -66,8 +67,29 @@ class TwinklySquares(Twinkly):
 
     async def render_full_frame(self):
         frame = [BLACK] * self.length
+        self.render_statuses(frame)
         frame = self.render_clock(frame,self.clock_x_offset,self.clock_y_offset)
         await self.send_movie(frame,2)
+
+    def render_statuses(self,frame):
+        for i in range(2,21,3):
+            for j in range(7,14,3):
+                frame[self.xyToIndex(i,j)] = DARK_GREEN
+                frame[self.xyToIndex(i,j+1)] = DARK_GREEN
+                frame[self.xyToIndex(i+1,j)] = DARK_GREEN
+                frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
+        i=20
+        j=1
+        frame[self.xyToIndex(i,j)] = DARK_GREEN
+        frame[self.xyToIndex(i,j+1)] = DARK_GREEN
+        frame[self.xyToIndex(i+1,j)] = DARK_GREEN
+        frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
+        j=4
+        frame[self.xyToIndex(i,j)] = DARK_GREEN
+        frame[self.xyToIndex(i,j+1)] = DARK_GREEN
+        frame[self.xyToIndex(i+1,j)] = DARK_GREEN
+        frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
+
 
     def render_clock(self,frame,x_offset,y_offset):
         # Convert current time to four separate digits

@@ -9,8 +9,8 @@ async def main() -> None:
             [[1,0],[2,1],[3,3]],
             [[0,0],[5,1],[4,1]],
         ],
-        clock_x_offset=3,
-        clock_y_offset=5,
+        clock_x_offset=1,
+        clock_y_offset=1,
         blink_speed=1000)
     await t.interview()
     await t.set_brightness(5)
