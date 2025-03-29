@@ -9,9 +9,10 @@ async def main() -> None:
             [[1,0],[2,1],[3,3]],
             [[0,0],[5,1],[4,1]],
         ],
-        clock_x_offset=1,
+        clock_x_offset=3,
         clock_y_offset=1,
-        blink_speed=1000)
+        blink_speed=1000,
+        mode="movie")
     await t.interview()
     await t.set_brightness(5)
     #await t.recalibrate()
@@ -25,8 +26,7 @@ async def main() -> None:
 
     while True:
         await t.render_full_frame()
-        time.sleep(60-time.localtime().tm_sec)
-
+        t.wait()
     await t.close()
 
 

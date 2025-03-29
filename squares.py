@@ -9,12 +9,14 @@ from small import digits,font_width,font_height
 
 class TwinklySquares(Twinkly):
     
-    def __init__(self,host,rows=None,cols=None,layout=None,clock_x_offset=1,clock_y_offset=1,blink_speed=1000):
+    def __init__(self,host,rows=None,cols=None,layout=None,clock_x_offset=1,clock_y_offset=1,blink_speed=1000,mode="movie"):
         # Call the parent constructor
         super().__init__(host=host)
         self.clock_x_offset = clock_x_offset
         self.clock_y_offset = clock_y_offset
         self.blink_speed = blink_speed
+        self.mode = mode
+        self.blink = True
         # If layout is provided, just set it
         if layout is not None: 
             self.layout = layout
@@ -68,49 +70,76 @@ class TwinklySquares(Twinkly):
     async def render_full_frame(self):
         frame = [BLACK] * self.length
         self.render_statuses(frame)
+        self.render_temperatures(frame,1,10)
         frame = self.render_clock(frame,self.clock_x_offset,self.clock_y_offset)
-        await self.send_movie(frame,2)
+        
+
+        if self.mode == "movie":
+            await self.send_movie(frame,2)
+        elif self.mode == "rt":
+            await self.send_rt(frame)
 
     def render_statuses(self,frame):
         for i in range(2,21,3):
-            for j in range(7,14,3):
-                frame[self.xyToIndex(i,j)] = DARK_GREEN
-                frame[self.xyToIndex(i,j+1)] = DARK_GREEN
-                frame[self.xyToIndex(i+1,j)] = DARK_GREEN
-                frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
-        i=20
-        j=1
-        frame[self.xyToIndex(i,j)] = DARK_GREEN
-        frame[self.xyToIndex(i,j+1)] = DARK_GREEN
-        frame[self.xyToIndex(i+1,j)] = DARK_GREEN
-        frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
-        j=4
-        frame[self.xyToIndex(i,j)] = DARK_GREEN
-        frame[self.xyToIndex(i,j+1)] = DARK_GREEN
-        frame[self.xyToIndex(i+1,j)] = DARK_GREEN
-        frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
+            j=7
+            frame[self.xyToIndex(i,j)] = DARK_GREEN
+            frame[self.xyToIndex(i,j+1)] = DARK_GREEN
+            frame[self.xyToIndex(i+1,j)] = DARK_GREEN
+            frame[self.xyToIndex(i+1,j+1)] = DARK_GREEN
 
 
     def render_clock(self,frame,x_offset,y_offset):
         # Convert current time to four separate digits
         now = time.localtime()
         numbers = [now.tm_hour//10,now.tm_hour%10,now.tm_min//10,now.tm_min%10]
-        x_offsets = [0 + x_offset, font_width+1 + x_offset, 2*(font_width)+4 + x_offset, 3*(font_width)+5 + x_offset]
+        x_offsets = [x_offset]
+        x_offsets.append(x_offsets[-1] + font_width + 1)
+        x_offsets.append(x_offsets[-1] + font_width + 3)
+        x_offsets.append(x_offsets[-1] + font_width + 1)
         # For each of the four digits
         for i in range(4):
             # Get the number
             num = numbers[i]
             self.print_glyph(frame,num,x_offsets[i],y_offset)
 
-        # Duplicate the frame
-        frame = frame * 2
+        if self.mode == "movie":
+            # Duplicate the frame
+            frame = frame * 2
         
-        # Add the colon to only the first frame
-        frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2-1)] = RED
-        frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2+1)] = RED
+        if self.blink:
+            # Add the colon to only the first frame
+            frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2-1)] = RED
+            frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2+1)] = RED
+
+        self.blink = not self.blink
 
         return frame
         
+
+
+    def render_temperatures(self,frame,x_offset,y_offset):
+        # Convert current time to four separate digits
+        temps = [-23,-56]
+        numbers = [temps[0]<0,abs(temps[0])//10,abs(temps[0])%10,temps[1]<0,abs(temps[1])//10,abs(temps[1])%10]
+        space = 2
+        x_offsets = [x_offset] 
+        x_offsets.append(x_offsets[-1]+3)
+        x_offsets.append(x_offsets[-1]+font_width+1)
+        x_offsets.append(x_offsets[-1]+font_width+space)
+        x_offsets.append(x_offsets[-1]+3)
+        x_offsets.append(x_offsets[-1]+font_width+1)
+
+        # For each of the four digits and 2 minus signs
+        for i in range(6):
+            # Get the number
+            num = numbers[i]
+            if i%3==0:
+                if num==True:
+                    frame[self.xyToIndex(x_offsets[i],y_offset+font_height//2)] = RED
+                    frame[self.xyToIndex(x_offsets[i]+1,y_offset+font_height//2)] = RED
+            else:
+                self.print_glyph(frame,num,x_offsets[i],y_offset)
+                
 
     async def show_calibrate(self):
         frame = [BLACK] * self.length
@@ -136,7 +165,12 @@ class TwinklySquares(Twinkly):
         await self.upload_movie(bytes([item for t in frame for item in t]))
         await self.set_mode("movie")
 
-    
+
+    async def send_rt(self,frame):
+        # Avoid flashing by first switching away from movie and then later back again
+        await self.set_mode("rt")
+        await self.send_frame_3(frame)
+
     def xyToIndex(self,x,y):
         # Determine which tile the requested global coordinate is on
         tile_info = self.layout[y//8][x//8]
@@ -169,3 +203,9 @@ class TwinklySquares(Twinkly):
                 index += (7-x) * 8 + (7-y)
         
         return index    
+    
+    def wait(self):
+        if self.mode == "movie":
+            time.sleep(60-time.localtime().tm_sec)
+        if self.mode == "rt":
+            time.sleep(self.blink_speed/1000)
