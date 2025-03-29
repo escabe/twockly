@@ -105,13 +105,15 @@ class TwinklySquares(Twinkly):
         if self.mode == "movie":
             # Duplicate the frame
             frame = frame * 2
+        else:
+            self.blink = not self.blink
         
         if self.blink:
             # Add the colon to only the first frame
             frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2-1)] = RED
             frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2+1)] = RED
 
-        self.blink = not self.blink
+    
 
         return frame
         
