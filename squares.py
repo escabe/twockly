@@ -5,7 +5,8 @@ RED = (0xFF,0x00,0x00)
 GREEN = (0x00,0xFF,0x00)
 DARK_GREEN = (0x00,0x77,0x00)
 
-from small import digits,font_width,font_height
+from awtrixfont import font_glyphs,font_data,font_height
+
 
 class TwinklySquares(Twinkly):
     
@@ -38,13 +39,27 @@ class TwinklySquares(Twinkly):
             raise Exception("Either layout must be provided or cols and rows")
 
     def print_glyph(self,res,n,x_offset,y_offset):
+        glyph_info = font_glyphs[n-0x20]
+        y_offset += font_height + glyph_info[5]
+        
         # Work through the font grid
-        for y in range(font_height):
-            for x in range(font_width):
+        for y in range(glyph_info[2]):
+            mask  = 0b10000000
+            char = font_data[glyph_info[0]+y]
+            for x in range(3):
                 # If pixel should be lit
-                if digits[n][y][x] == 1:
+                if char & mask:
                     # Update the correct pixel
                     res[self.xyToIndex(x+x_offset,y+y_offset)] = RED  
+                mask >>= 1    
+
+        return glyph_info[3]
+
+    def print_text(self,text,x_offset,y_offset,frame):
+        # For each of the four digits
+        for c in text:
+            # Get the number
+            x_offset += self.print_glyph(frame,ord(c),x_offset,y_offset)
 
     async def recalibrate(self):
         self.layout = list() 
@@ -72,7 +87,6 @@ class TwinklySquares(Twinkly):
         self.render_statuses(frame)
         self.render_temperatures(frame,1,10)
         frame = self.render_clock(frame,self.clock_x_offset,self.clock_y_offset)
-        
 
         if self.mode == "movie":
             await self.send_movie(frame,2)
@@ -89,58 +103,30 @@ class TwinklySquares(Twinkly):
 
 
     def render_clock(self,frame,x_offset,y_offset):
-        # Convert current time to four separate digits
-        now = time.localtime()
-        numbers = [now.tm_hour//10,now.tm_hour%10,now.tm_min//10,now.tm_min%10]
-        x_offsets = [x_offset]
-        x_offsets.append(x_offsets[-1] + font_width + 1)
-        x_offsets.append(x_offsets[-1] + font_width + 3)
-        x_offsets.append(x_offsets[-1] + font_width + 1)
-        # For each of the four digits
-        for i in range(4):
-            # Get the number
-            num = numbers[i]
-            self.print_glyph(frame,num,x_offsets[i],y_offset)
-
+        # Render
         if self.mode == "movie":
-            # Duplicate the frame
-            frame = frame * 2
+            numbers = time.strftime("%H %M",time.localtime())     
+            self.print_text(numbers,x_offset,y_offset,frame)
+            frame *= 2
+            numbers = time.strftime("%H:%M",time.localtime())
+            self.print_text(numbers,x_offset,y_offset,frame)
         else:
             self.blink = not self.blink
-        
-        if self.blink:
-            # Add the colon to only the first frame
-            frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2-1)] = RED
-            frame[self.xyToIndex(x_offsets[2]-2,y_offset+font_height//2+1)] = RED
-
-    
+            if self.blink:
+                numbers = time.strftime("%H:%M",time.localtime())
+            else:
+                numbers = time.strftime("%H %M",time.localtime())            
+            self.print_text(numbers,x_offset,y_offset,frame)
 
         return frame
-        
-
 
     def render_temperatures(self,frame,x_offset,y_offset):
         # Convert current time to four separate digits
         temps = [-23,-56]
-        numbers = [temps[0]<0,abs(temps[0])//10,abs(temps[0])%10,temps[1]<0,abs(temps[1])//10,abs(temps[1])%10]
-        space = 2
-        x_offsets = [x_offset] 
-        x_offsets.append(x_offsets[-1]+3)
-        x_offsets.append(x_offsets[-1]+font_width+1)
-        x_offsets.append(x_offsets[-1]+font_width+space)
-        x_offsets.append(x_offsets[-1]+3)
-        x_offsets.append(x_offsets[-1]+font_width+1)
+        numbers = "-23-45"
 
         # For each of the four digits and 2 minus signs
-        for i in range(6):
-            # Get the number
-            num = numbers[i]
-            if i%3==0:
-                if num==True:
-                    frame[self.xyToIndex(x_offsets[i],y_offset+font_height//2)] = RED
-                    frame[self.xyToIndex(x_offsets[i]+1,y_offset+font_height//2)] = RED
-            else:
-                self.print_glyph(frame,num,x_offsets[i],y_offset)
+        self.print_text(numbers,x_offset,y_offset,frame)
                 
 
     async def show_calibrate(self):

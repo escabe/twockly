@@ -12,7 +12,7 @@ async def main() -> None:
         clock_x_offset=3,
         clock_y_offset=1,
         blink_speed=1000,
-        mode="movie")
+        mode="rt")
     await t.interview()
     await t.set_brightness(5)
     #await t.recalibrate()
