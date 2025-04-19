@@ -50,7 +50,9 @@ class TwinklySquares(Twinkly):
                 # If pixel should be lit
                 if char & mask:
                     # Update the correct pixel
-                    res[self.xyToIndex(x+x_offset,y+y_offset)] = RED  
+                    index = self.xyToIndex(x+x_offset,y+y_offset)
+                    if index != -1:
+                        res[index] = RED
                 mask >>= 1    
 
         return glyph_info[3]
@@ -85,7 +87,7 @@ class TwinklySquares(Twinkly):
     async def render_full_frame(self):
         frame = [BLACK] * self.length
         self.render_statuses(frame)
-        self.render_temperatures(frame,1,10)
+        self.render_temperatures(frame,0,10)
         frame = self.render_clock(frame,self.clock_x_offset,self.clock_y_offset)
 
         if self.mode == "movie":
@@ -160,6 +162,8 @@ class TwinklySquares(Twinkly):
         await self.send_frame_3(frame)
 
     def xyToIndex(self,x,y):
+        if y < 0 or x < 0 or y//8 >= self.rows or x//8 >= self.cols:
+            return -1
         # Determine which tile the requested global coordinate is on
         tile_info = self.layout[y//8][x//8]
         # Start with the base offset to end up on the right tile
@@ -189,7 +193,7 @@ class TwinklySquares(Twinkly):
                 index += (7-x) * 8 + (y)
             else:      
                 index += (7-x) * 8 + (7-y)
-        
+               
         return index    
     
     def wait(self):
